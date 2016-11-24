@@ -2,12 +2,14 @@ package Controller;
 
 import Model.Produto;
 import Model.ProdutoDados;
+import Model.Relatorio;
 import Model.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ProdutoDAO {
@@ -212,7 +214,7 @@ public class ProdutoDAO {
         int mes = cal.get(Calendar.MONTH) + 1;
         int ano = cal.get(Calendar.YEAR);
         String data = ano + "-" + mes + "-" + dia;
-        
+
         String sql = "SELECT quantidade FROM produto_dados WHERE data_validade = ? AND produto_id_produto = ?";
         try {
             PreparedStatement stmte = this.con.prepareStatement(sql);
@@ -250,6 +252,57 @@ public class ProdutoDAO {
             return lista;
         } catch (Exception e) {
             this.msg = "Erro ao listar validades: " + e.getMessage();
+            return null;
+        }
+    }
+
+    public List<Relatorio> relatorioSaida(Date datainic, Date datafim) {
+        String sql = "SELECT \n"
+                + "    p.descricao,\n"
+                + "    SUM(ur.qtd_retirada),\n"
+                + "    ur.data_retirada,\n"
+                + "    pd.data_validade\n"
+                + "FROM\n"
+                + "    usuario_retira_produto_dados ur,\n"
+                + "    produto_dados pd,\n"
+                + "    produto p\n"
+                + "WHERE\n"
+                + "    ur.produto_dados_id_produto_dados = pd.id_produto_dados\n"
+                + "        AND pd.produto_id_produto = p.id_produto\n"
+                + "        AND ur.data_retirada >= ?\n"
+                + "        AND ur.data_retirada <= ?\n"
+                + "GROUP BY descricao , data_retirada , data_validade\n"
+                + "ORDER BY data_retirada;";
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(datainic);
+        int dia = cal.get(Calendar.DAY_OF_MONTH);
+        int mes = cal.get(Calendar.MONTH) + 1;
+        int ano = cal.get(Calendar.YEAR);
+        String data1 = ano + "-" + mes + "-" + dia;
+        cal.setTime(datafim);
+        int dia1 = cal.get(Calendar.DAY_OF_MONTH);
+        int mes1 = cal.get(Calendar.MONTH) + 1;
+        int ano1 = cal.get(Calendar.YEAR);
+        String data2 = ano1 + "-" + mes1 + "-" + dia1;
+
+        try {
+            PreparedStatement stmte = this.con.prepareStatement(sql);
+            stmte.setString(1, data1);
+            stmte.setString(2, data2);
+            ResultSet rs = stmte.executeQuery();
+            List<Relatorio> lista = new ArrayList();
+            while (rs.next()) {
+                Relatorio rSaida = new Relatorio();
+                rSaida.setDescricao(rs.getString("descricao"));
+                rSaida.setQtd1(rs.getInt("SUM(ur.qtd_retirada)"));
+                rSaida.setDate1(rs.getDate("data_retirada"));
+                rSaida.setDate2(rs.getDate("data_validade"));
+                lista.add(rSaida);
+            }
+            this.msg = "Relatório de saída realizado com sucesso!";
+            return lista;
+        } catch (Exception e) {
+            this.msg = "Erro ao criar relatório: " + e.getMessage();
             return null;
         }
     }

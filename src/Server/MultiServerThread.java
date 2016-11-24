@@ -4,6 +4,7 @@ import Controller.ProdutoDAO;
 import Controller.UsuarioDAO;
 import Model.Produto;
 import Model.ProdutoDados;
+import Model.Relatorio;
 import Model.Usuario;
 import java.net.*;
 import java.io.*;
@@ -141,6 +142,15 @@ public class MultiServerThread extends Thread {
                     ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
                     p = (Produto) inFromClient2.readObject();
                     outFromServer2.writeObject(this.produtoDAO.listagemProdutosValidade(p));
+                    outFromServer.writeUTF(this.produtoDAO.getMsg());
+                }
+                case 13: {
+                    outFromServer.writeBoolean(true);
+                    ObjectOutputStream outFromServer2 = new ObjectOutputStream(socket.getOutputStream());
+                    ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
+                    Relatorio r = null;
+                    r = (Relatorio) inFromClient2.readObject();
+                    outFromServer2.writeObject(this.produtoDAO.relatorioSaida(r.getDate1(),r.getDate2()));
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
                 }
                 break;
