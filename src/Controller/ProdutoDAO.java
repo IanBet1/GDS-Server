@@ -306,4 +306,97 @@ public class ProdutoDAO {
             return null;
         }
     }
+
+    public List<Relatorio> relatorioValidade(Date datainic, Date datafim) {
+        String sql = "SELECT \n"
+                + "    p.descricao,\n"
+                + "    pd.quantidade,\n"
+                + "    pd.data_validade,\n"
+                + "    DATEDIFF(pd.data_validade, NOW())\n"
+                + "FROM\n"
+                + "    produto p,\n"
+                + "    produto_dados pd\n"
+                + "WHERE\n"
+                + "    p.id_produto = pd.produto_id_produto\n"
+                + "        AND pd.data_validade >= ?\n"
+                + "        AND pd.data_validade <= ?\n"
+                + "ORDER BY p.descricao , pd.data_validade;";
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(datainic);
+        int dia = cal.get(Calendar.DAY_OF_MONTH);
+        int mes = cal.get(Calendar.MONTH) + 1;
+        int ano = cal.get(Calendar.YEAR);
+        String data1 = ano + "-" + mes + "-" + dia;
+        cal.setTime(datafim);
+        int dia1 = cal.get(Calendar.DAY_OF_MONTH);
+        int mes1 = cal.get(Calendar.MONTH) + 1;
+        int ano1 = cal.get(Calendar.YEAR);
+        String data2 = ano1 + "-" + mes1 + "-" + dia1;
+
+        try {
+            PreparedStatement stmte = this.con.prepareStatement(sql);
+            stmte.setString(1, data1);
+            stmte.setString(2, data2);
+            ResultSet rs = stmte.executeQuery();
+            List<Relatorio> lista = new ArrayList();
+            while (rs.next()) {
+                Relatorio rSaida = new Relatorio();
+                rSaida.setDescricao(rs.getString("descricao"));
+                rSaida.setQtd1(rs.getInt("quantidade"));
+                rSaida.setDate1(rs.getDate("data_validade"));
+                rSaida.setQtd2(rs.getInt("DATEDIFF(pd.data_validade, NOW())"));
+                lista.add(rSaida);
+            }
+            this.msg = "Relatório de validade realizado com sucesso!";
+            return lista;
+        } catch (Exception e) {
+            this.msg = "Erro ao criar relatório: " + e.getMessage();
+            return null;
+        }
+    }
+
+    public boolean venceEmSete(Date datainic, Date datafim) {
+        boolean validade = false;
+        String sql = "SELECT \n"
+                + "    p.descricao,\n"
+                + "    pd.quantidade,\n"
+                + "    pd.data_validade,\n"
+                + "    DATEDIFF(pd.data_validade, NOW())\n"
+                + "FROM\n"
+                + "    produto p,\n"
+                + "    produto_dados pd\n"
+                + "WHERE\n"
+                + "    p.id_produto = pd.produto_id_produto\n"
+                + "        AND pd.data_validade >= ?\n"
+                + "        AND pd.data_validade <= ?\n"
+                + "ORDER BY p.descricao , pd.data_validade;";
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(datainic);
+        int dia = cal.get(Calendar.DAY_OF_MONTH);
+        int mes = cal.get(Calendar.MONTH) + 1;
+        int ano = cal.get(Calendar.YEAR);
+        String data1 = ano + "-" + mes + "-" + dia;
+        cal.setTime(datafim);
+        int dia1 = cal.get(Calendar.DAY_OF_MONTH) + 7;
+        int mes1 = cal.get(Calendar.MONTH) + 1;
+        int ano1 = cal.get(Calendar.YEAR);
+        String data2 = ano1 + "-" + mes1 + "-" + dia1;
+
+        try {
+            PreparedStatement stmte = this.con.prepareStatement(sql);
+            stmte.setString(1, data1);
+            stmte.setString(2, data2);
+            ResultSet rs = stmte.executeQuery();
+            if (rs.next()) {
+                validade = true;
+            } else {
+                validade = false;
+            }
+            this.msg = "Produtos que vencem em sete dias checados!";
+            return validade;
+        } catch (Exception e) {
+            this.msg = "Erro ao validar: " + e.getMessage();
+            return false;
+        }
+    }
 }

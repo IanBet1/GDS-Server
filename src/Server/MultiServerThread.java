@@ -154,6 +154,25 @@ public class MultiServerThread extends Thread {
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
                 }
                 break;
+                case 14: {
+                    outFromServer.writeBoolean(true);
+                    ObjectOutputStream outFromServer2 = new ObjectOutputStream(socket.getOutputStream());
+                    ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
+                    Relatorio r = null;
+                    r = (Relatorio) inFromClient2.readObject();
+                    outFromServer2.writeObject(this.produtoDAO.relatorioValidade(r.getDate1(),r.getDate2()));
+                    outFromServer.writeUTF(this.produtoDAO.getMsg());
+                }
+                break;
+                case 15: {
+                    outFromServer.writeBoolean(true);
+                    ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
+                    Relatorio r = null;
+                    r = (Relatorio) inFromClient2.readObject();
+                    outFromServer.writeBoolean(this.produtoDAO.venceEmSete(r.getDate1(),r.getDate2()));
+                    outFromServer.writeUTF(this.produtoDAO.getMsg());
+                }
+                break;
                 default: {
                 }
                 break;

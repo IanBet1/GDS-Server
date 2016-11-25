@@ -11,7 +11,7 @@ public class MultiServer {
 
         try {
             serverSocket = new ServerSocket(1094);
-            System.err.println("Servidor GDS v0.9.3 inicializado na porta 1094.\nAguardando novas conexões.");
+            System.err.println("Servidor GDS v0.9.4 inicializado na porta 1094.\nAguardando novas conexões.");
         } catch (IOException e) {
             System.err.println("Impossível escutar na porta 1094.");
             System.exit(-1);
