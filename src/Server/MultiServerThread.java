@@ -166,10 +166,7 @@ public class MultiServerThread extends Thread {
                 break;
                 case 15: {
                     outFromServer.writeBoolean(true);
-                    ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
-                    Relatorio r = null;
-                    r = (Relatorio) inFromClient2.readObject();
-                    outFromServer.writeBoolean(this.produtoDAO.venceEmSete(r.getDate1(),r.getDate2()));
+                    outFromServer.writeBoolean(this.produtoDAO.venceEmSete());
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
                 }
                 break;

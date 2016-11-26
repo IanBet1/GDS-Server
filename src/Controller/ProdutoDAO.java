@@ -7,6 +7,7 @@ import Model.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -355,7 +356,7 @@ public class ProdutoDAO {
         }
     }
 
-    public boolean venceEmSete(Date datainic, Date datafim) {
+    public boolean venceEmSete() {
         boolean validade = false;
         String sql = "SELECT \n"
                 + "    p.descricao,\n"
@@ -370,18 +371,8 @@ public class ProdutoDAO {
                 + "        AND pd.data_validade >= ?\n"
                 + "        AND pd.data_validade <= ?\n"
                 + "ORDER BY p.descricao , pd.data_validade;";
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(datainic);
-        int dia = cal.get(Calendar.DAY_OF_MONTH);
-        int mes = cal.get(Calendar.MONTH) + 1;
-        int ano = cal.get(Calendar.YEAR);
-        String data1 = ano + "-" + mes + "-" + dia;
-        cal.setTime(datafim);
-        int dia1 = cal.get(Calendar.DAY_OF_MONTH) + 7;
-        int mes1 = cal.get(Calendar.MONTH) + 1;
-        int ano1 = cal.get(Calendar.YEAR);
-        String data2 = ano1 + "-" + mes1 + "-" + dia1;
-
+        String data1 = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
+        String data2 = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
         try {
             PreparedStatement stmte = this.con.prepareStatement(sql);
             stmte.setString(1, data1);
