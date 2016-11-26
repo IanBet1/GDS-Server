@@ -8,6 +8,7 @@ import Model.Relatorio;
 import Model.Usuario;
 import java.net.*;
 import java.io.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,12 +138,15 @@ public class MultiServerThread extends Thread {
                 break;
                 case 12: {
                     outFromServer.writeBoolean(true);
-                    Produto p = null;
                     ObjectOutputStream outFromServer2 = new ObjectOutputStream(socket.getOutputStream());
                     ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
+                    Produto p = null;
                     p = (Produto) inFromClient2.readObject();
-                    outFromServer2.writeObject(this.produtoDAO.listagemProdutosValidade(p));
+                    List<ProdutoDados> lista = this.produtoDAO.listagemProdutosValidade(p);
+                    outFromServer2.writeObject(lista);
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
+                    outFromServer2.close();
+                    inFromClient2.close();
                 }
                 case 13: {
                     outFromServer.writeBoolean(true);
@@ -150,7 +154,7 @@ public class MultiServerThread extends Thread {
                     ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
                     Relatorio r = null;
                     r = (Relatorio) inFromClient2.readObject();
-                    outFromServer2.writeObject(this.produtoDAO.relatorioSaida(r.getDate1(),r.getDate2()));
+                    outFromServer2.writeObject(this.produtoDAO.relatorioSaida(r.getDate1(), r.getDate2()));
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
                 }
                 break;
@@ -160,7 +164,7 @@ public class MultiServerThread extends Thread {
                     ObjectInputStream inFromClient2 = new ObjectInputStream(socket.getInputStream());
                     Relatorio r = null;
                     r = (Relatorio) inFromClient2.readObject();
-                    outFromServer2.writeObject(this.produtoDAO.relatorioValidade(r.getDate1(),r.getDate2()));
+                    outFromServer2.writeObject(this.produtoDAO.relatorioValidade(r.getDate1(), r.getDate2()));
                     outFromServer.writeUTF(this.produtoDAO.getMsg());
                 }
                 break;
@@ -177,7 +181,6 @@ public class MultiServerThread extends Thread {
             inFromClient1.close();
             outFromServer.close();
             socket.close();
-
         } catch (IOException e) {
             System.err.println("Erro: " + e.getMessage());
         } catch (ClassNotFoundException ex) {

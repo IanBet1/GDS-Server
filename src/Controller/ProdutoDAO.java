@@ -370,9 +370,17 @@ public class ProdutoDAO {
                 + "    p.id_produto = pd.produto_id_produto\n"
                 + "        AND pd.data_validade >= ?\n"
                 + "        AND pd.data_validade <= ?\n"
+                + "        AND pd.quantidade >= 1\n"
+                + "        AND DATEDIFF(pd.data_validade, NOW()) >= 0\n"
                 + "ORDER BY p.descricao , pd.data_validade;";
         String data1 = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
-        String data2 = new SimpleDateFormat("YYYY-MM-dd").format(new Date());
+        Date dataHoje = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dataHoje);
+        c.add(Calendar.DATE, +7);
+        dataHoje = c.getTime();
+        String data2 = new SimpleDateFormat("YYYY-MM-dd").format(dataHoje);
+        
         try {
             PreparedStatement stmte = this.con.prepareStatement(sql);
             stmte.setString(1, data1);
