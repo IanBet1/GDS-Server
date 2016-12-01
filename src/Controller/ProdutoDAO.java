@@ -58,7 +58,7 @@ public class ProdutoDAO {
     }
 
     public List<Produto> listagemProdutos() {
-        String sql = "SELECT * FROM produto";
+        String sql = "SELECT * FROM produto ORDER BY descricao";
         try {
             PreparedStatement stmte = this.con.prepareStatement(sql);
             ResultSet rs = stmte.executeQuery();
